@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Commands/Arm.h"
+#include "subsystems/Arm.h"
 
 Arm::Arm() : Subsystem("ExampleSubsystem"), armMotor(new TalonSRX(5))
  {
-   armMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::Analog);
+   armMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute);
   armMotor->SetSensorPhase(true);
   armMotor->SetSelectedSensorPosition(0);
 
@@ -17,6 +17,8 @@ Arm::Arm() : Subsystem("ExampleSubsystem"), armMotor(new TalonSRX(5))
    armMotor->Config_kI(0, 0);
    armMotor->Config_kD(0, 0);
    armMotor->Config_kF(0, 0);
+    absolutePosition = armMotor->GetSelectedSensorPosition(0) & 0xFFF;
+    armMotor->SetSelectedSensorPosition(absolutePosition);
  }
 
 void Arm::InitDefaultCommand() {
@@ -27,7 +29,9 @@ void Arm::InitDefaultCommand() {
 void Arm::moveArm(double set) {
   // Set the default command for a subsystem here.
   // SetDefaultCommand(new MySpecialCommand());
+  
   armMotor->Set(ControlMode::Position, set);
+
 }
 
 TalonSRX* Arm::getArmMotor() {
